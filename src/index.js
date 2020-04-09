@@ -27,7 +27,7 @@ var eez = $.ajax({
 });  
 
 var extensao = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/extensao_PC/BRA_extensao_pc.geojson",
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/BrasilData/master/extensao_pc.geojson",
   dataType: "json",
   success: console.log("CP Extension data successfully loaded."),
   error: function (xhr) {
