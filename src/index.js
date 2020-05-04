@@ -154,8 +154,11 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
         "<b>Nome: </b>" + feature.properties.LOCLNGNAM + "<br>" +
         "<b>Status: </b>" + feature.properties.STATUS + "<br>" +
         "<b>Área: </b>" + 
-        feature.properties.SQKM.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + " km &#178; <br>" +
-        "<b>População (2019): </b>" + feature.properties.POP_CNTRY.toLocaleString('de-DE', { maximumFractionDigits: 0 })
+        feature.properties.SQKM.toLocaleString('de-DE', { 
+          maximumFractionDigits: 2 }) + " km&#178; <br>" +
+        "<b>População (2019): </b>" + 
+        feature.properties.POP_CNTRY.toLocaleString('de-DE', { 
+          maximumFractionDigits: 0 })
       );
       layer.bindTooltip(feature.properties.LOCSHRTNAM,{
         permanent: false
@@ -174,39 +177,15 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
           "<b>Descrição: </b>" + "Malvinas" + "<br>" +
           "<b>Fonte: </b>" + 
           "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=47625 target='_blank'>Link.</a>" + "<br>" +
-          "<b>Área (km &#178; ): " + "<br>" +
+          "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+            maximumFractionDigits: 2 }) + " km&#178; <br>" +
           "<b>Obs.: </b>"
         );
       }
     }
   ).addTo(map);
   
-  function link(feature){
-    return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + 
-    feature.properties.MRGID + " target='_blank'>Link.</a>"; 
-  }
-  
-  function getAreaColor(feature){
-    console.log(feature);
-    	switch (feature.properties.POL_TYPE){
-      	case '200NM' : return '#133863';
-      	case 'Joint regime': return 'Gold';
-        case 'Overlapping claim' : return 'Red';
-        	break;
-      }
-  }
-  
-  function areaStyle(feature){
-  	return {
-    	fillColor: getAreaColor(feature),
-      weight: 2,
-      opacity: 1,
-      color: 'white',
-      dashArray: '3',
-      fillOpacity: 0.40
-    };
-  }
-  
+
   var EEZ = L.geoJSON(eez.responseJSON, {
    style: areaStyle,
     onEachFeature: function( feature, layer ){
@@ -214,8 +193,9 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
         "<b>Descrição: </b>" + feature.properties.GEONAME + "<br>" +
         "<b>Tipo: </b>" + feature.properties.POL_TYPE + "<br>" +
         "<b>Fonte: </b>" + link(feature) + "<br>" +
-        "<b>Área (km &#178; ): " + 
-        feature.properties.AREA_KM2.toLocaleString('de-DE', { maximumFractionDigits: 2 }) + "<br>" 
+        "<b>Área: </b>" + 
+        feature.properties.AREA_KM2.toLocaleString('de-DE', { 
+          maximumFractionDigits: 2 }) + " km&#178; <br>" 
       );
     }
   }
@@ -231,7 +211,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       layer.bindPopup(
         "<b>Nome: </b>" + feature.properties.nome + "<br>" +
         "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
-        "<b>Área (km &#178; ): "
+        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+          maximumFractionDigits: 2 }) + " km&#178;"
       );
     }
   }
@@ -246,16 +227,13 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       onEachFeature: function( feature, layer ){
         layer.bindPopup(
           "<b>Descrição: </b>" + feature.properties.LME_NAME + "<br>" +
-          "<b>Área (km &#178; ): " + 
-          feature.properties.SUM_GIS_KM.toLocaleString('de-DE', { maximumFractionDigits: 2 }) 
+          "<b>Área: </b>" + 
+          feature.properties.SUM_GIS_KM.toLocaleString('de-DE', { 
+            maximumFractionDigits: 2 }) + " km&#178;"
         );
       }
     }
   );
-  
-  function surface(feature){
-    return feature.properties.SURFACE/1000000;
-  }
   
   var FAO = L.geoJSON(fao.responseJSON, {
       style: {
@@ -266,8 +244,9 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       onEachFeature: function( feature, layer ){
         layer.bindPopup(
           "<b>Descrição: </b>" + feature.properties.NAME_ES + "<br>" +
-          "<b>Área (km &#178; ): " + 
-          surface(feature).toLocaleString('de-DE', { maximumFractionDigits: 2 })+  "<br>" +
+          "<b>Área: </b>" + 
+          surface(feature).toLocaleString('de-DE', { maximumFractionDigits: 2 })+  
+          " km&#178;<br>" +
           "<b>Oceano:  </b>" + feature.properties.OCEAN +  "<br>" +
           "<b>Área FAO:  </b>" + feature.properties.F_AREA +  "<br>" +
           "<b>Sub-área FAO:  </b>" + feature.properties.F_SUBAREA +  "<br>" +
