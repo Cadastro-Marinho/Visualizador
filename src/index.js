@@ -57,19 +57,23 @@ var fao = $.ajax({
 /* when().done() SECTION*/
 // Add the variable for each of your AJAX requests to $.when()
 $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
+  
+  var mappos = L.Permalink.getMapLocation(zoom = 3, center = [-25, -75]);
 
   // Initializes the map
   var map = L.map('map', {
-      center: [-25, -75],
+      center: mappos.center,
+	    zoom: mappos.zoom,
       attributionControl: false,
       zoomControl: false,
-      zoom: 3,
       preferCanvas: false,
       fullscreenControl: true,
       fullscreenControlOptions: {
         position: 'topright'
       }
   });
+  
+  L.Permalink.setup(map);
   
   // Adds Esri Base Maps
   var WSM = L.tileLayer(
