@@ -75,6 +75,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
   
   L.Permalink.setup(map);
   
+  var sidebar = L.control.sidebar('sidebar').addTo(map);
+  
   // Adds Esri Base Maps
   var WSM = L.tileLayer(
     'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}.png', {
@@ -338,6 +340,7 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
     'basemaps']
   }).addTo(map);
   
+  /*
   // Adds graticule
   L.latlngGraticule({
      showLabel: true,
@@ -349,5 +352,7 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
        {start: 8, end: 10, interval: 1},
        {start: 11, end:15, interval: 0.2}
      ]
-  }).addTo(map);        
+  }).addTo(map);    
+  */
+  
 }); 
