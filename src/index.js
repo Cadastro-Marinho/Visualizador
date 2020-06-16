@@ -376,7 +376,7 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       // Add to map after loading (default: true) ?
       addToMap: true,
       // File size limit in kb (default: 1024) ?
-      fileSizeLimit: 2048,
+      fileSizeLimit: 5120,
       // Restrict accepted file formats (default: .geojson, .json, .kml, and .gpx) ?
       formats: [
           '.geojson',
