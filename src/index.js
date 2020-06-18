@@ -125,7 +125,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
   // Adds GEBCO Base Layer
   var GEBCO = L.tileLayer.wms(
     'https://www.gebco.net/data_and_products/gebco_web_services/2019/mapserv?', {
-      layers: 'GEBCO_2019_Grid'
+      layers: 'GEBCO_2019_Grid',
+      label: "GEBCO 2019",
     }
     
   );
