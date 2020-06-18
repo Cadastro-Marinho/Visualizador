@@ -8,15 +8,6 @@ var latinamerica = $.ajax({
   }
 });
 
-var falklands = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/malvinas.geojson",
-  dataType: "json",
-  success: console.log("Falklands data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});
-
 var eez = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
   dataType: "json",
@@ -101,7 +92,7 @@ var fao = $.ajax({
 
 /* when().done() SECTION*/
 // Add the variable for each of your AJAX requests to $.when()
-$.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
+$.when(latinamerica, eez, extensao, lme, fao).done(function() {
   
   var mappos = L.Permalink.getMapLocation(zoom = 3, center = [-25, -75]);
 
@@ -191,6 +182,49 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
     }
   );
   
+  //Adds WFS server (IGN)
+  var owsrootUrl = 'https://wms.ign.gob.ar/geoserver/wfs';
+
+  var defaultParameters = {
+      service : 'WFS',
+      version : '2.0',
+      request : 'GetFeature',
+      typeName : 'ign:departamento',
+      outputFormat : 'application/json',
+      format_options : 'callback:getJson',
+      SrsName : 'EPSG:4326'
+  };
+  
+  var parameters = L.Util.extend(defaultParameters);
+  var URL = owsrootUrl + L.Util.getParamString(parameters);
+  
+  var Departamento = null;
+
+  var departamento = $.ajax({
+      url : URL,
+      dataType : 'json',
+      jsonpCallback : 'getJson',
+      success: function (response) {
+          Departamento = L.geoJson(response, {
+              style: function (feature) {
+                  return {
+                      stroke: true,
+                      fillColor: 'yellow',
+                      fillOpacity: 0.25
+                  };
+              },
+              onEachFeature: function (feature, layer) {
+                  popupOptions = {maxWidth: 200};
+                  layer.bindPopup(
+                    "<b>Departamento: </b>" + feature.properties.fna + "<br>" +
+                    "<b>Código INDEC: </b>" + feature.properties.in1 + "<br>" +
+                    "<b>Área: </b>" 
+                      ,popupOptions);
+              }
+          }).addTo(map);
+      }
+  });
+  
   // Adds GeoJson Data
   
   var LatinAmerica = L.geoJSON(latinamerica.responseJSON, {
@@ -218,26 +252,6 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
     }
   }).addTo(map);
   
-  var FALKLANDS = L.geoJSON(falklands.responseJSON, {
-      style: {
-        color: '#f1f4c7',
-        weight: 2,
-        fillOpacity: 0.25
-      },
-      onEachFeature: function( feature, layer ){
-        layer.bindPopup(
-          "<b>Descrição: </b>" + "Malvinas" + "<br>" +
-          "<b>Fonte: </b>" + 
-          "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=47625 target='_blank'>Link.</a>" + "<br>" +
-          "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-            maximumFractionDigits: 2 }) + " km&#178; <br>" +
-          "<b>Obs.: </b>"
-        );
-      }
-    }
-  ).addTo(map);
-  
-
   var EEZ = L.geoJSON(eez.responseJSON, {
    style: areaStyle,
     onEachFeature: function( feature, layer ){
@@ -439,7 +453,7 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
     
   var groupedOverlays = {
     "Limites territoriais":{
-      "América Latina": LatinAmerica,
+      "América Latina": LatinAmerica
     },
     "Zonas Marítimas":{
       "Águas Internas AR": IWAR,
