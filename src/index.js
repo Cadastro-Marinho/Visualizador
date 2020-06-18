@@ -122,6 +122,14 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
   
   var sidebar = L.control.sidebar('sidebar').addTo(map);
   
+  // Adds GEBCO Base Layer
+  var GEBCO = L.tileLayer.wms(
+    'https://www.gebco.net/data_and_products/gebco_web_services/2019/mapserv?', {
+      layers: 'GEBCO_2019_Grid'
+    }
+    
+  );
+  
   // Adds Esri Base Maps
   var WSM = L.tileLayer(
     'http://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}.png', {
@@ -167,7 +175,7 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org"/a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
   });
 
-  // Adds WMS Layer (Marine Regions)
+  // Adds WMS Layers (Marine Regions)
   var Ecoregions = L.tileLayer.wms(
     'http://geo.vliz.be/geoserver/Ecoregions/wms', {
       layers: 'ecoregions',
@@ -180,14 +188,6 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       layers: '1',
       version: '1.3'
     }
-  );
-  
-  // Adds Bathymetry data
-  var GEBCO = L.tileLayer.wms(
-    'https://www.gebco.net/data_and_products/gebco_web_services/2019/mapserv?', {
-      layers: 'GEBCO_2019_Grid'
-    }
-    
   );
   
   // Adds GeoJson Data
@@ -265,7 +265,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       layer.bindPopup(
         "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
         "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" +
+        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjp6b25hX2Vjb25vbWljYV9leGNsdXNpdmFfYXJnZW50aW5hLnBkZg%3D%3D target='_blank'>Link.</a>"  
       );
     }
   }
@@ -298,7 +299,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       layer.bindPopup(
         "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
         "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" +
+        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjpwbGF0YWZvcm1hX2NvbnRpbmVudGFsLnBkZg%3D%3D target='_blank'>Link.</a>"
       );
     }
   }
@@ -338,7 +340,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       layer.bindPopup(
         "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
         "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" +
+        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjptYXJfdGVycml0b3JpYWxfYXJnZW50aW5vLnBkZg%3D%3D target='_blank'>Link.</a>"
       );
     }
   }
@@ -357,7 +360,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       layer.bindPopup(
         "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
         "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" +
+        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjp6b25hX2NvbnRpZ3VhX2FyZ2VudGluYS5wZGY%3D target='_blank'>Link.</a>"
       );
     }
   }
@@ -403,7 +407,8 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
   
   var marinhaMercante = L.tileLayer.wms("https://geoservicos.inde.gov.br/geoserver/MPOG/ows", {
     layers: 'Marinha_Mercante',
-    transparent: true
+    transparency: true,
+    opacity: 0.2
   });
   
 
@@ -417,7 +422,7 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
   // Adds basemaps choices
     
   var basemaps = [
-          Esri_OceanBasemap, Esri_NatGeoWorldMap, Esri_WorldImagery, 
+          Esri_OceanBasemap, GEBCO, Esri_NatGeoWorldMap, Esri_WorldImagery, 
           OpenStreetMap_Mapnik , OpenTopoMap
           ];
         
@@ -449,9 +454,6 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       "Ecoregions": Ecoregions,
       "Large Marine Ecosystems": LME,
       "FAO": FAO
-    },
-    "Batimetria": {
-      "GEBCO (2019)": GEBCO
     },
     "Nomes": {
       "NOAA": NOAA
