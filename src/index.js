@@ -35,6 +35,33 @@ var eezAR = $.ajax({
   }
 });  
 
+var iwAR = $.ajax({
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/aguas_internas_argentina.geojson",
+  dataType: "json",
+  success: console.log("Argentinean IW data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});  
+
+var tsAR = $.ajax({
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/mar_territorial_argentino.geojson",
+  dataType: "json",
+  success: console.log("Argentinean TS data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});  
+
+var czAR = $.ajax({
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/zona_contigua_argentina.geojson",
+  dataType: "json",
+  success: console.log("Argentinean CZ data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});  
+
 var extensao = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/BrasilData/master/extensao_pc.geojson",
   dataType: "json",
@@ -259,13 +286,72 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       );
     }
   }
-  ).addTo(map);
+  );
   
   var EXTENSAOAR = L.geoJSON(extensaoAR.responseJSON, {
     style: {
       color: 'LightGray',
       weight: 2,
       fillOpacity: 0.25
+    },  
+    onEachFeature: function( feature, layer ){
+      layer.bindPopup(
+        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
+        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" 
+      );
+    }
+  }
+  );
+  
+  var IWAR = L.geoJSON(iwAR.responseJSON, {
+    style: {
+      fillColor: '#133863',
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: 0.40
+    },
+    onEachFeature: function( feature, layer ){
+      layer.bindPopup(
+        "<b>Descrição: </b>" + feature.properties.geoname + "<br>" +
+        "<b>Tipo: </b>" + feature.properties.pol_type + "<br>" +
+        "<b>Área: </b>" + 
+        feature.properties.area_km2.toLocaleString('de-DE', { 
+          maximumFractionDigits: 2 }) + " km&#178; <br>" 
+      );
+    }
+  }
+  ).addTo(map);
+  
+  var TSAR = L.geoJSON(tsAR.responseJSON, {
+    style: {
+      fillColor: '#133863',
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: 0.40
+    },  
+    onEachFeature: function( feature, layer ){
+      layer.bindPopup(
+        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
+        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" 
+      );
+    }
+  }
+  ).addTo(map);
+  
+  var CZAR = L.geoJSON(czAR.responseJSON, {
+    style: {
+      fillColor: '#133863',
+      weight: 2,
+      opacity: 1,
+      color: 'white',
+      dashArray: '3',
+      fillOpacity: 0.40
     },  
     onEachFeature: function( feature, layer ){
       layer.bindPopup(
@@ -314,6 +400,12 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
       }
     }
   );
+  
+  var marinhaMercante = L.tileLayer.wms("https://geoservicos.inde.gov.br/geoserver/MPOG/ows", {
+    layers: 'Marinha_Mercante',
+    transparent: true
+  });
+  
 
   // Adds Minimap
   var miniMap = new L.Control.MiniMap(Esri_NatGeoWorldMap, {
@@ -342,11 +434,16 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
   var groupedOverlays = {
     "Limites territoriais":{
       "América Latina": LatinAmerica,
-      //"Águas Internas": IW,
-      //"Mar Territorial (12MN)": TS,
+    },
+    "Zonas Marítimas":{
+      "Águas Internas AR": IWAR,
+      "Mar Territorial (12MN) AR": TSAR,
+      "Zona Contígua (12MN) AR": CZAR,
       //"Zona Contígua (24MN)": CZ,
       "Zona Econômica Exclusiva (200MN)": EEZ,
-      "Extensão da PC": EXTENSAO
+      "Zona Econômica Exclusiva (200MN) AR": EEZAR,
+      "Extensão da PC brasileira": EXTENSAO,
+      "Extensão da PC argentina": EXTENSAOAR
     },
     "Limites Ambientais":{
       "Ecoregions": Ecoregions,
@@ -358,6 +455,9 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
     },
     "Nomes": {
       "NOAA": NOAA
+    },
+    "MPOG":{
+      "Marinha Mercante": marinhaMercante
     }
     //"Ambiental": {
     //  "Unidades de Conservação": UC
