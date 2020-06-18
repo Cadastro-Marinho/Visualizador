@@ -26,6 +26,15 @@ var eez = $.ajax({
   }
 });  
 
+var eezAR = $.ajax({
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/zona_economica_exclusiva_argentina.geojson",
+  dataType: "json",
+  success: console.log("Argentinian EEZ data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});  
+
 var extensao = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/BrasilData/master/extensao_pc.geojson",
   dataType: "json",
@@ -34,6 +43,15 @@ var extensao = $.ajax({
     alert(xhr.statusText);
   }
 });
+
+var extensaoAR = $.ajax({
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/plataforma_continental.geojson",
+  dataType: "json",
+  success: console.log("Argentinian PC data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});  
 
 var lme = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/LME66.geojson",
@@ -207,6 +225,25 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
   }
   ).addTo(map);
   
+  var EEZAR = L.geoJSON(eezAR.responseJSON, {
+   style: {
+    fillColor: '#133863',
+    weight: 2,
+    opacity: 1,
+    color: 'white',
+    dashArray: '3',
+    fillOpacity: 0.40
+   },
+    onEachFeature: function( feature, layer ){
+      layer.bindPopup(
+        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
+        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" 
+      );
+    }
+  }
+  ).addTo(map);
+  
   var EXTENSAO = L.geoJSON(extensao.responseJSON, {
     style: {
       color: 'LightGray',
@@ -219,6 +256,22 @@ $.when(latinamerica, falklands, eez, extensao, lme, fao).done(function() {
         "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
         "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
           maximumFractionDigits: 2 }) + " km&#178;"
+      );
+    }
+  }
+  ).addTo(map);
+  
+  var EXTENSAOAR = L.geoJSON(extensaoAR.responseJSON, {
+    style: {
+      color: 'LightGray',
+      weight: 2,
+      fillOpacity: 0.25
+    },  
+    onEachFeature: function( feature, layer ){
+      layer.bindPopup(
+        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
+        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" 
       );
     }
   }
