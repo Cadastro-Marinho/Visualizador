@@ -35,15 +35,6 @@ var iwAR = $.ajax({
   }
 });  
 
-var tsAR = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/mar_territorial_argentino.geojson",
-  dataType: "json",
-  success: console.log("Argentinean TS data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});  
-
 var czAR = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/zona_contigua_argentina.geojson",
   dataType: "json",
@@ -89,10 +80,19 @@ var fao = $.ajax({
   }
 });
 
+var cables = $.ajax({
+  url: 'https://raw.githubusercontent.com/telegeography/www.submarinecablemap.com/master/public/api/v2/cable/cable-geo.json',
+    dataType: "json",
+  success: console.log("Cable data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+
 
 /* when().done() SECTION*/
 // Add the variable for each of your AJAX requests to $.when()
-$.when(latinamerica, eez, extensao, lme, fao).done(function() {
+$.when(latinamerica, eez, extensao, lme, fao, cables).done(function() {
   
   var mappos = L.Permalink.getMapLocation(zoom = 3, center = [-25, -75]);
 
@@ -175,33 +175,126 @@ $.when(latinamerica, eez, extensao, lme, fao).done(function() {
       opacity: 0.40
   });
   
-  var NOAA = L.tileLayer.wms(
-    'https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer?', {
-      layers: '1',
-      version: '1.3'
-    }
-  );
+  // Adds NOAA Undersea Feature Names from NOAA
   
-  //Adds WFS server (IGN)
-  var owsrootUrl = 'https://wms.ign.gob.ar/geoserver/wfs';
-
-  var defaultParameters = {
-      service : 'WFS',
-      version : '2.0',
-      request : 'GetFeature',
-      typeName : 'ign:departamento',
-      outputFormat : 'application/json',
-      format_options : 'callback:getJson',
-      SrsName : 'EPSG:4326'
+  var options = {
+    'version': '1.3',
+    'format': 'image/png', 
+    'transparent': true, 
+    'opacity': 1,
+    'info_format': 'text/html'
   };
   
-  var parameters = L.Util.extend(defaultParameters);
-  var URL = owsrootUrl + L.Util.getParamString(parameters);
+  var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer", options);
+  
+  var NOAAPolygons = NOAA.getLayer('1');
+  var NOAALines = NOAA.getLayer('2');
+  var NOAAPoints = NOAA.getLayer('3');
+  
+  /*
+  var NOAAPolygons = L.tileLayer.wms(
+    'https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer', {
+      layers: '1',
+      version: '1.3',
+      format: 'image/png',
+      transparent: true,
+      opacity: 0.7
+    }
+  );
+  */
+  
+  var correntesMaritimas = null;
+  
+  var correntesmaritimas = $.ajax({
+      url : 'http://services1.arcgis.com/VAI453sU9tG9rSmh/ArcGIS/rest/services/WorldGeo_Physical_Climate_features/FeatureServer/6',
+      dataType : 'json',
+      jsonpCallback : 'getJson',
+      success: function (response) {
+          correntesMaritimas = L.geoJson(response, {
+              style: function (feature) {
+                  return {
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    dashArray: '3',
+                  };
+              }
+          }).addTo(map);
+      }
+  });
+  
+  //Adds IBGE WFS Server Data
+
+  var zonasMaritimasBrasil = null;
+  
+  var zonasmaritimasbrasil = $.ajax({
+      url : ibge('CCAR:BCIM_Outros_Limites_Oficiais_L'),
+      dataType : 'json',
+      jsonpCallback : 'getJson',
+      success: function (response) {
+          zonasMaritimasBrasil = L.geoJson(response, {
+              style: function (feature) {
+                  return {
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    dashArray: '3',
+                  };
+              }
+          }).addTo(map);
+      }
+  });
+  
+  // IBGE WMS layers
+  
+  var options = {
+    'format': 'image/png', 
+    'transparent': true, 
+    'opacity': 0.5,
+    'info_format': 'text/html'
+  };
+  
+  var IBGE = L.WMS.source("https://geoservicos.ibge.gov.br/geoserver/ows", options);
+  
+  var curvaBatimetrica = IBGE.getLayer('CCAR:BCIM_Curva_Batimetrica_L');
+  var pontoCotado = IBGE.getLayer('CCAR:BCIM_Ponto_Cotado_Batimetrico_P');
+  
+  /*  
+  var curvaBatimetrica = null;
+  
+  var curvabatimetrica = $.ajax({
+      url : ibge('CCAR:BCIM_Curva_Batimetrica_L'),
+      dataType : 'json',
+      jsonpCallback : 'getJson',
+      success: function (response) {
+          curvaBatimetrica = L.geoJson(response, {
+              style: function (feature) {
+                  return {
+                      stroke: true,
+                      fillColor: 'yellow',
+                      fillOpacity: 0.25
+                  };
+              },
+              onEachFeature: function (feature, layer) {
+                  popupOptions = {maxWidth: 200};
+                  layer.bindPopup(
+                    "<b>Departamento: </b>" + feature.properties.fna + "<br>" +
+                    "<b>Código INDEC: </b>" + feature.properties.in1 + "<br>" +
+                    "<b>Área: </b>" 
+                      ,popupOptions);
+              }
+          }).addTo(map);
+      }
+  });
+  */
+  
+  //Adds IGN WFS Server Data
+
   
   var Departamento = null;
-
+  
   var departamento = $.ajax({
-      url : URL,
+      url : ign('ign:departamento'),
       dataType : 'json',
       jsonpCallback : 'getJson',
       success: function (response) {
@@ -225,7 +318,66 @@ $.when(latinamerica, eez, extensao, lme, fao).done(function() {
       }
   });
   
+  
+  var Departamento = L.geoJSON(departamento.responseJSON, {
+    style: function(feature) {
+      return{
+        stroke: true,
+        fillColor: 'yellow',
+        fillOpacity: 0.25
+      };
+    },
+    onEachFeature: function( feature, layer ){
+        popupOptions = {maxWidth: 200};
+        layer.bindPopup(
+          "<b>Departamento: </b>" + feature.properties.fna + "<br>" +
+          "<b>Código INDEC: </b>" + feature.properties.in1 + "<br>" +
+          "<b>Área: </b>" 
+             ,popupOptions);
+    }
+    }).addTo(map);
+  
+  //var TSAR = null;
+  
+  var tsar = $.ajax({
+      url : ign('ign:mar_territorial_argentino'),
+      dataType : 'json',
+      jsonpCallback : 'getJson',
+      success: function (response) {
+          TSAR = L.geoJson(response, {
+              style: function (feature) {
+                  return {
+                    fillColor: '#133863',
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    dashArray: '3',
+                    fillOpacity: 0.40
+                  };
+              },
+              onEachFeature: function (feature, layer) {
+                  popupOptions = {maxWidth: 200};
+                  layer.bindPopup(
+                    "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
+                    "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+          maximumFractionDigits: 0 }) + " km&#178; <br>" +
+                    "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjptYXJfdGVycml0b3JpYWxfYXJnZW50aW5vLnBkZg%3D%3D target='_blank'>Link.</a>"
+                      ,popupOptions);
+              }
+          }).addTo(map);
+      }
+  });
+  
   // Adds GeoJson Data
+  
+  var Cables = L.geoJSON(cables.responseJSON, {
+    style: function(feature) {
+      return {color: feature.properties.color};
+    },
+    onEachFeature: function (feature, layer) {
+		  layer.bindPopup(feature.properties.slug);
+	  }
+  }).addTo(map);
   
   var LatinAmerica = L.geoJSON(latinamerica.responseJSON, {
     style: function(feature) {
@@ -342,26 +494,6 @@ $.when(latinamerica, eez, extensao, lme, fao).done(function() {
   }
   ).addTo(map);
   
-  var TSAR = L.geoJSON(tsAR.responseJSON, {
-    style: {
-      fillColor: '#133863',
-      weight: 2,
-      opacity: 1,
-      color: 'white',
-      dashArray: '3',
-      fillOpacity: 0.40
-    },  
-    onEachFeature: function( feature, layer ){
-      layer.bindPopup(
-        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
-        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" +
-        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjptYXJfdGVycml0b3JpYWxfYXJnZW50aW5vLnBkZg%3D%3D target='_blank'>Link.</a>"
-      );
-    }
-  }
-  ).addTo(map);
-  
   var CZAR = L.geoJSON(czAR.responseJSON, {
     style: {
       fillColor: '#133863',
@@ -457,8 +589,8 @@ $.when(latinamerica, eez, extensao, lme, fao).done(function() {
     },
     "Zonas Marítimas":{
       "Águas Internas AR": IWAR,
-      "Mar Territorial (12MN) AR": TSAR,
-      "Zona Contígua (12MN) AR": CZAR,
+      //"Mar Territorial (12MN) AR": TSAR,
+      //"Zona Contígua (12MN) AR": CZAR,
       //"Zona Contígua (24MN)": CZ,
       "Zona Econômica Exclusiva (200MN)": EEZ,
       "Zona Econômica Exclusiva (200MN) AR": EEZAR,
@@ -471,11 +603,18 @@ $.when(latinamerica, eez, extensao, lme, fao).done(function() {
       "FAO": FAO
     },
     "Nomes": {
-      "NOAA": NOAA
+      "Pontos NOAA": NOAAPoints,
+      "Linhas NOAA": NOAALines,
+      "Polígonos NOAA": NOAAPolygons,
     },
     "MPOG":{
       "Marinha Mercante": marinhaMercante
+    },
+    "Batimetria":{
+      "Pontos Cotados": pontoCotado,
+      "Curvas Batimétricas": curvaBatimetrica,
     }
+    
     //"Ambiental": {
     //  "Unidades de Conservação": UC
     //},

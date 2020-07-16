@@ -1,3 +1,43 @@
+function ign(name){
+  
+  var owsrootUrl = 'https://wms.ign.gob.ar/geoserver/wfs';
+  
+  var defaultParameters = {
+      service : 'WFS',
+      version : '2.0',
+      request : 'GetFeature',
+      typeName : name,
+      outputFormat : 'application/json',
+      format_options : 'callback:getJson',
+      SrsName : 'EPSG:4674'
+  };
+  
+  var parameters = L.Util.extend(defaultParameters);
+  var URL = owsrootUrl + L.Util.getParamString(parameters);
+  
+  return URL;
+}
+
+function ibge(name){
+  
+  var owsrootUrl = 'https://geoservicos.ibge.gov.br/geoserver/ows';
+  
+  var defaultParameters = {
+      service : 'WFS',
+      version : '2.0',
+      request : 'GetFeature',
+      typeName : name,
+      outputFormat : 'application/json',
+      format_options : 'callback:getJson',
+      SrsName : 'EPSG:4326'
+  };
+  
+  var parameters = L.Util.extend(defaultParameters);
+  var URL = owsrootUrl + L.Util.getParamString(parameters);
+  
+  return URL;
+}
+
 function link(feature){
   return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + 
   feature.properties.MRGID + " target='_blank'>Link.</a>"; 
