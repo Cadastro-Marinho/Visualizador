@@ -121,7 +121,7 @@ var zonasmaritimasbrasil = $.ajax({
   }
 });
 
-
+/*
 var limitesUY = $.ajax({
   url : igm('LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000'),
   dataType : 'json',
@@ -131,7 +131,7 @@ var limitesUY = $.ajax({
     alert(xhr.statusText);
   }
 });
-
+*/
 
 /* when().done() SECTION*/
 // Add the variable for each of your AJAX requests to $.when()
