@@ -121,6 +121,16 @@ var zonasmaritimasbrasil = $.ajax({
   }
 });
 
+var correntesmaritimas = $.ajax({
+  url : 'http://services1.arcgis.com/VAI453sU9tG9rSmh/ArcGIS/rest/services/WorldGeo_Physical_Climate_features/FeatureServer/',
+  dataType : 'json',
+  jsonpCallback : 'getJson',
+  success: console.log("Sea Currents data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+
 /*
 var limitesUY = $.ajax({
   url : igm('LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000'),
@@ -292,26 +302,17 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
   );
   */
   
-  var correntesMaritimas = null;
-  
-  var correntesmaritimas = $.ajax({
-      url : 'http://services1.arcgis.com/VAI453sU9tG9rSmh/ArcGIS/rest/services/WorldGeo_Physical_Climate_features/FeatureServer/6',
-      dataType : 'json',
-      jsonpCallback : 'getJson',
-      success: function (response) {
-          correntesMaritimas = L.geoJson(response, {
-              style: function (feature) {
-                  return {
-                    weight: 2,
-                    opacity: 1,
-                    color: 'white',
-                    dashArray: '3',
-                  };
-              }
-          }).addTo(map);
-      }
-  });
-  
+  var correntesMaritimas = L.geoJson(correntesmaritimas.responseJSON, {
+    style: function (feature) {
+      return {
+        weight: 2,
+        opacity: 1,
+        color: 'white',
+        dashArray: '3',
+      };
+    }
+  }).addTo(map);
+
   var linhaCostaAR = IGN.getLayer('ign:linea_de_limite_BA000').addTo(map);
   var linhaBaseAR = IGN.getLayer('ign:linea_de_limite_BA011').addTo(map);
   var limiteLateralAR = IGN.getLayer('ign:linea_de_limite_070102').addTo(map);
