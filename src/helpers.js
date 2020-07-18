@@ -1,3 +1,15 @@
+// NOAA WMS Layers Source
+
+var optionsNOAA = {
+  'version': '1.3',
+  'format': 'image/png', 
+  'transparent': true, 
+  'opacity': 1,
+  'info_format': 'text/html'
+};
+
+var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer", optionsNOAA);
+
 // IBGE WMS Layers Source
 
 var optionsIBGE = {
@@ -11,7 +23,7 @@ var IBGE = L.WMS.source("https://geoservicos.ibge.gov.br/geoserver/ows", options
 
 // IGN WMS Layers Source
 
-  var optionsAR = {
+var optionsAR = {
   'format': 'image/png', 
   'version': '1.3.0',
   'transparent': true, 
