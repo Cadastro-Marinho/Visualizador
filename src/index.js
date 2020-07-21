@@ -8,37 +8,20 @@ var latinamerica = $.ajax({
   }
 });
 
+var zonasmaritimasbrasil = $.ajax({
+  url : ibge('CCAR:BCIM_Outros_Limites_Oficiais_L'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
+  success: console.log("Zonas Marítimas (BR) data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+
 var eez = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
   dataType: "json",
   success: console.log("Latin America EEZ data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});  
-
-var eezAR = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/zona_economica_exclusiva_argentina.geojson",
-  dataType: "json",
-  success: console.log("Argentinian EEZ data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});  
-
-var iwAR = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/aguas_internas_argentina.geojson",
-  dataType: "json",
-  success: console.log("Argentinean IW data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});  
-
-var czAR = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/zona_contigua_argentina.geojson",
-  dataType: "json",
-  success: console.log("Argentinean CZ data successfully loaded."),
   error: function (xhr) {
     alert(xhr.statusText);
   }
@@ -53,10 +36,60 @@ var extensao = $.ajax({
   }
 });
 
-var extensaoAR = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/plataforma_continental.geojson",
+var departamento = $.ajax({
+  url : ign('ign:departamento'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
+  success: console.log("Departaments (AR) data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+
+var iwAR = $.ajax({
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/aguas_internas_argentina.geojson",
   dataType: "json",
-  success: console.log("Argentinian PC data successfully loaded."),
+  success: console.log("Argentinean IW data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});  
+
+var tsar = $.ajax({
+  url : ign('ign:mar_territorial_argentino'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
+  success: console.log("Territorial Sea (AR) data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+
+var czAR = $.ajax({
+  url : ign('ign:zona_contigua_argentina'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
+  success: console.log("Contiguous Zone (AR) data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+}); 
+
+var eezAR = $.ajax({
+  url : ign('ign:zona_economica_exclusiva_argentina'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
+  success: console.log("Exclusive Economic Data (AR) data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+
+var extensaoAR = $.ajax({
+  url : ign('ign:plataforma_continental'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
+  success: console.log("Exclusive Economic Data (AR) data successfully loaded."),
   error: function (xhr) {
     alert(xhr.statusText);
   }
@@ -84,38 +117,6 @@ var cables = $.ajax({
   url: 'https://raw.githubusercontent.com/telegeography/www.submarinecablemap.com/master/public/api/v2/cable/cable-geo.json',
   dataType: "json",
   success: console.log("Cable data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});
-
-
-
-var departamento = $.ajax({
-  url : ign('ign:departamento'),
-  dataType : 'json',
-  jsonpCallback : 'getJson',
-  success: console.log("Departaments (AR) data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});
-
-var tsar = $.ajax({
-  url : ign('ign:mar_territorial_argentino'),
-  dataType : 'json',
-  jsonpCallback : 'getJson',
-  success: console.log("Departaments (AR) data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});
-
-var zonasmaritimasbrasil = $.ajax({
-  url : ibge('CCAR:BCIM_Outros_Limites_Oficiais_L'),
-  dataType : 'json',
-  jsonpCallback : 'getJson',
-  success: console.log("Zonas Marítimas (BR) data successfully loaded."),
   error: function (xhr) {
     alert(xhr.statusText);
   }
@@ -607,14 +608,14 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
     //  "Limites Marinhos (UY)": LimitesNacionalesMarinosUY
     },
     "Zonas Marítimas":{
-      "Águas Internas AR": IWAR,
-      "Mar Territorial (12MN) AR": TSAR,
-      "Zona Contígua (12MN) AR": CZAR,
-      //"Zona Contígua (24MN)": CZ,
       "Zona Econômica Exclusiva (200MN)": EEZ,
-      "Zona Econômica Exclusiva (200MN) AR": EEZAR,
-      "Extensão da PC brasileira": EXTENSAO,
-      "Extensão da PC argentina": EXTENSAOAR
+      "Plataforma Continental (BR)": EXTENSAO,
+      "Águas Internas (AR)": IWAR,
+      "Mar Territorial (AR)": TSAR,
+      "Zona Contígua (AR)": CZAR,
+      "Zona Econômica Exclusiva (AR)": EEZAR,
+      "Plataforma Continental (AR)": EXTENSAOAR
+      //"Zona Contígua (24MN)": CZ,
     },
     "Limites Ambientais":{
       "Ecoregions": Ecoregions,
