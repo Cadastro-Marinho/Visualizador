@@ -1,3 +1,26 @@
+// Marine Regions WFS Source
+
+function marineRegions(name, sql_text){
+                
+  var owsrootUrl = 'https://geo.vliz.be/geoserver/MarineRegions/wfs';
+  
+  var defaultParameters = {
+      service : 'WFS',
+      version : '2.0',
+      request : 'GetFeature',
+      typeName : name,
+      outputFormat : 'application/json',
+      format_options : 'callback:getJson',
+      SrsName : 'EPSG:4326',
+      cql_filter: sql_text,
+  };
+  
+  var parameters = L.Util.extend(defaultParameters);
+  var URL = owsrootUrl + L.Util.getParamString(parameters);
+  
+  return URL;
+}
+
 // NOAA WMS Layers Source
 
 var optionsNOAA = {
@@ -33,6 +56,9 @@ var optionsAR = {
   
 var IGN = L.WMS.source("https://wms.ign.gob.ar/geoserver/ows", optionsAR);
 
+/* This works in browser:
+https://srvgis.igm.gub.uy/arcgis/services/LimitesNacionalesMarinos_wfs_250000/MapServer/WFSServer?service=wfs&request=GetFeature&typeName=LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000&outputFormat=GEOJSON
+*/
 function igm(name){
               
   var owsrootUrl = 'https://srvgis.igm.gub.uy/arcgis/services/LimitesNacionalesMarinos_wfs_250000/MapServer/WFSServer';
@@ -44,8 +70,9 @@ function igm(name){
       typeName : name,
       outputFormat : 'GEOJSON',
       format_options : 'callback:getJson',
-      SrsName : 'EPSG:4326',
-      IgnoreAxisOrientation: '1'
+//      SrsName : 'EPSG:4326',
+//      IgnoreAxisOrientation: '1',
+//      pageSize: 0
   };
   
   var parameters = L.Util.extend(defaultParameters);
@@ -99,9 +126,16 @@ function link(feature){
   feature.properties.MRGID + " target='_blank'>Link.</a>"; 
 }
 
+function link1(feature){
+  return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + 
+  feature.properties.mrgid + " target='_blank'>Link.</a>"; 
+}
+
 function surface(feature){
   return feature.properties.SURFACE/1000000;
 }
+
+// Computes area with turf.js in sq. meters and transform to sq. kilometers.
 
 function Area(feature){
   return turf.area(feature)/1000000;

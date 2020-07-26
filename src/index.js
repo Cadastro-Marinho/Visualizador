@@ -8,11 +8,23 @@ var latinamerica = $.ajax({
   }
 });
 
+/*
 var zonasmaritimasbrasil = $.ajax({
   url : ibge('CCAR:BCIM_Outros_Limites_Oficiais_L'),
   dataType : 'json',
   jsonpCallback : 'getJson',
   success: console.log("Zonas Marítimas (BR) data successfully loaded."),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+*/
+
+var limitesUY = $.ajax({
+  url: igm('LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000'),
+  dataType: "json",
+  jsonpCallback : 'getJson',
+  success: console.log("Limites Nacionales Marinos (UY) data successfully loaded."),
   error: function (xhr) {
     alert(xhr.statusText);
   }
@@ -47,7 +59,7 @@ var departamento = $.ajax({
 });
 
 var iwAR = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/aguas_internas_argentina.geojson",
+  url:"https://raw.githubusercontent.com/Cadastro-Marinho/ArgentinaData/master/iwAR.geojson",
   dataType: "json",
   success: console.log("Argentinean IW data successfully loaded."),
   error: function (xhr) {
@@ -89,30 +101,33 @@ var extensaoAR = $.ajax({
   url : ign('ign:plataforma_continental'),
   dataType : 'json',
   jsonpCallback : 'getJson',
-  success: console.log("Exclusive Economic Data (AR) data successfully loaded."),
+  success: console.log("PC (AR) data successfully loaded."),
   error: function (xhr) {
     alert(xhr.statusText);
   }
 });  
 
 var lme = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/LME66.geojson",
-  dataType: "json",
+  url : marineRegions('MarineRegions:lme'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
   success: console.log("LME data successfully loaded."),
   error: function (xhr) {
     alert(xhr.statusText);
   }
-});     
+});  
 
 var fao = $.ajax({
-  url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/FAO_Area.geojson",
-  dataType: "json",
+  url : marineRegions('MarineRegions:fao'),
+  dataType : 'json',
+  jsonpCallback : 'getJson',
   success: console.log("FAO data successfully loaded."),
   error: function (xhr) {
     alert(xhr.statusText);
   }
 });
 
+/*
 var cables = $.ajax({
   url: 'https://raw.githubusercontent.com/telegeography/www.submarinecablemap.com/master/public/api/v2/cable/cable-geo.json',
   dataType: "json",
@@ -122,7 +137,7 @@ var cables = $.ajax({
   }
 });
 
-/*
+
 var correntesmaritimas = $.ajax({
   url : 'http://services1.arcgis.com/VAI453sU9tG9rSmh/ArcGIS/rest/services/WorldGeo_Physical_Climate_features/FeatureServer/',
   dataType : 'json',
@@ -132,21 +147,11 @@ var correntesmaritimas = $.ajax({
     alert(xhr.statusText);
   }
 });
-
-var limitesUY = $.ajax({
-  url : igm('LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000'),
-  dataType : 'json',
-  jsonpCallback : 'getJson',
-  success: console.log("Limites Nacionales Marinos (UY) data successfully loaded."),
-  error: function (xhr) {
-    alert(xhr.statusText);
-  }
-});
 */
 
 /* when().done() SECTION*/
 // Add the variable for each of your AJAX requests to $.when()
-$.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(function() {
+$.when(latinamerica, eez).done(function() {
   
   var mappos = L.Permalink.getMapLocation(zoom = 3, center = [-25, -75]);
 
@@ -286,6 +291,7 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
   
   // 3.2 Brasil
 
+  /*
   var zonasMaritimasBrasil = L.geoJson(zonasmaritimasbrasil.responseJSON, {
     style: function (feature) {
       return {
@@ -293,6 +299,20 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
         opacity: 1,
         color: 'RoyalBlue'
       };
+    }
+  }).addTo(map);
+  */
+  
+  var zonasMaritimasBrasil = new L.WFS({
+    url: 'https://geoservicos.ibge.gov.br/geoserver/ows',
+    typeNS: 'CCAR',
+    geometryField: 'geom',
+    typeName: 'BCIM_Outros_Limites_Oficiais_L',
+    crs: L.CRS.EPSG4326,
+    style: {
+        color:  'RoyalBlue',
+        weight: 1,
+        opacity: 1
     }
   }).addTo(map);
   
@@ -325,7 +345,7 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
           maximumFractionDigits: 2 }) + " km&#178;"
       );
     }
-  });
+  }).addTo(map);
   
   // 3.3 Argentina
   
@@ -342,8 +362,7 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
       layer.bindPopup(
         "<b>Descrição: </b>" + feature.properties.geoname + "<br>" +
         "<b>Tipo: </b>" + feature.properties.pol_type + "<br>" +
-        "<b>Área: </b>" + 
-        feature.properties.area_km2.toLocaleString('de-DE', { 
+        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
           maximumFractionDigits: 2 }) + " km&#178; <br>" 
       );
     }
@@ -423,11 +442,42 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
         "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjpwbGF0YWZvcm1hX2NvbnRpbmVudGFsLnBkZg%3D%3D target='_blank'>Link.</a>"
       );
     }
-  });
+  }).addTo(map);
   
   // 3.4 Uruguai
   
   /*
+    var LimitesNacionalesMarinosUY = new L.WFS({
+    url: 'https://srvgis.igm.gub.uy/arcgis/services/LimitesNacionalesMarinos_wfs_250000/MapServer/WFSServer',
+    geometryField: 'geometry',
+    typeNS: 'LimitesNacionalesMarinos_wfs_250000',
+    typeName: 'LimitesNacionalesMarinos_wfs_250000',
+    crs: L.CRS.EPSG4326,
+    service: 'WFS',
+    style: {
+        color:  'RoyalBlue',
+        weight: 1,
+        opacity: 1
+    }
+  }).addTo(map);
+  */
+  /*
+  var LimitesNacionalesMarinosUY = new L.GeoJSON();
+
+  function getJson(data) {
+    LimitesNacionalesMarinosUY.addData(data);
+  }
+
+  $.ajax({
+    url : igm('LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000'),
+    jsonpCallback: 'getJson',
+    success: getJson,
+    error: function (xhr) {
+      alert(xhr.statusText);
+    }
+  });
+
+  */
   var LimitesNacionalesMarinosUY = L.geoJSON(limitesUY.responseJSON, {
     style: function (feature) {
       return {
@@ -437,8 +487,7 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
       };
     }
   }).addTo(map);
-  */
-  
+
   // 4. Adds thematic layers
   
   // 4.1 General layers
@@ -447,7 +496,8 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
   var Ecoregions = L.tileLayer.wms(
     'http://geo.vliz.be/geoserver/Ecoregions/wms', {
       layers: 'ecoregions',
-      transparency: true,
+      format: 'image/png',
+      transparent: true,
       opacity: 0.40
   });
   
@@ -459,14 +509,13 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
       },
       onEachFeature: function( feature, layer ){
         layer.bindPopup(
-          "<b>Descrição: </b>" + feature.properties.LME_NAME + "<br>" +
+          "<b>Descrição: </b>" + feature.properties.lme_name + "<br>" +
           "<b>Área: </b>" + 
-          feature.properties.SUM_GIS_KM.toLocaleString('de-DE', { 
+          feature.properties.sum_gis_km.toLocaleString('de-DE', { 
             maximumFractionDigits: 2 }) + " km&#178;"
         );
       }
-    }
-  );
+  });
   
   var FAO = L.geoJSON(fao.responseJSON, {
       style: {
@@ -476,18 +525,14 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
       },
       onEachFeature: function( feature, layer ){
         layer.bindPopup(
-          "<b>Descrição: </b>" + feature.properties.NAME_ES + "<br>" +
+          "<b>Zona: </b>" + feature.properties.zone + "<br>" +
           "<b>Área: </b>" + 
-          surface(feature).toLocaleString('de-DE', { maximumFractionDigits: 2 })+  
+          Area(feature).toLocaleString('de-DE', { maximumFractionDigits: 2 })+  
           " km&#178;<br>" +
-          "<b>Oceano:  </b>" + feature.properties.OCEAN +  "<br>" +
-          "<b>Área FAO:  </b>" + feature.properties.F_AREA +  "<br>" +
-          "<b>Sub-área FAO:  </b>" + feature.properties.F_SUBAREA +  "<br>" +
-          "<b>Divisão FAO: </b>" + feature.properties.F_DIVISION
+          "<b>Link:  </b>" + link1(feature) +  "<br>"
         );
       }
-    }
-  );
+  });
   
   // Adds NOAA Undersea Feature Names from NOAA
   
@@ -506,7 +551,7 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
       };
     }
   }).addTo(map);
-  */
+
   
   var Cables = L.geoJSON(cables.responseJSON, {
     style: function(feature) {
@@ -516,6 +561,8 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
 		  layer.bindPopup(feature.properties.slug);
 	  }
   }).addTo(map);
+  
+  */
   
   // 4.2 Brasil layers
 
@@ -605,7 +652,7 @@ $.when(latinamerica, eez, extensao, lme, fao, cables, departamento).done(functio
       "Limite da Plataforma Continental (AR)": limitePCAR,
       "Limite Lateral (AR)": limiteLateralAR,
       "Limites Marinhos (BR)": zonasMaritimasBrasil,
-    //  "Limites Marinhos (UY)": LimitesNacionalesMarinosUY
+      "Limites Marinhos (UY)": LimitesNacionalesMarinosUY
     },
     "Zonas Marítimas":{
       "Zona Econômica Exclusiva (200MN)": EEZ,
