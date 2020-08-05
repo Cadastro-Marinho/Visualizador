@@ -1,3 +1,64 @@
+// 1. WMS Sources
+
+// 1.1 Generic
+
+// NOAA WMS Layers Source
+
+var optionsNOAA = {
+  'version': '1.3.0',
+  'format': 'image/png', 
+  'transparent': true, 
+  'opacity': 1,
+  'info_format': 'text/html'
+};
+
+// var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer", optionsNOAA);
+
+var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/IHO/undersea_features/MapServer/WMSServer", optionsNOAA);
+
+// 1.2 Brazil
+
+// IBGE WMS Layers Source
+
+var optionsIBGE = {
+  'format': 'image/png', 
+  'transparent': true, 
+  'opacity': 0.5,
+  'info_format': 'text/html'
+};
+
+var IBGE = L.WMS.source("https://geoservicos.ibge.gov.br/geoserver/ows", optionsIBGE);
+
+// 1.3 Argentina
+
+// IGN WMS Layers Source
+
+var optionsIGN = {
+  'format': 'image/png', 
+  'version': '1.3.0',
+  'transparent': true, 
+  'opacity': 0.5,
+  'info_format': 'text/html'
+};
+  
+var IGN = L.WMS.source("https://wms.ign.gob.ar/geoserver/ows", optionsIGN);
+
+// 1.4 Uruguay
+
+var optionsDINAMA = {
+  'version': '1.3.0',
+  'format': 'image/png', 
+  'transparent': true, 
+  'opacity': 1,
+  'info_format': 'text/html'
+};
+
+var DINAMA = L.WMS.source("https://www.dinama.gub.uy/geoserver/u19600217/wms", optionsDINAMA);
+
+// 2. WFS Sources
+
+// 2.1 Generic
+
 // Marine Regions WFS Source
 
 function marineRegions(name, sql_text){
@@ -21,42 +82,51 @@ function marineRegions(name, sql_text){
   return URL;
 }
 
-// NOAA WMS Layers Source
+// 2.2 Brazil
 
-var optionsNOAA = {
-  'version': '1.3.0',
-  'format': 'image/png', 
-  'transparent': true, 
-  'opacity': 1,
-  'info_format': 'text/html'
-};
-
-// var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer", optionsNOAA);
-
-var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/IHO/undersea_features/MapServer/WMSServer", optionsNOAA);
-
-// IBGE WMS Layers Source
-
-var optionsIBGE = {
-  'format': 'image/png', 
-  'transparent': true, 
-  'opacity': 0.5,
-  'info_format': 'text/html'
-};
-
-var IBGE = L.WMS.source("https://geoservicos.ibge.gov.br/geoserver/ows", optionsIBGE);
-
-// IGN WMS Layers Source
-
-var optionsAR = {
-  'format': 'image/png', 
-  'version': '1.3.0',
-  'transparent': true, 
-  'opacity': 0.5,
-  'info_format': 'text/html'
-};
+function ibge(name){
   
-var IGN = L.WMS.source("https://wms.ign.gob.ar/geoserver/ows", optionsAR);
+  var owsrootUrl = 'https://geoservicos.ibge.gov.br/geoserver/ows';
+  
+  var defaultParameters = {
+      service : 'WFS',
+      version : '2.0',
+      request : 'GetFeature',
+      typeName : name,
+      outputFormat : 'application/json',
+      format_options : 'callback:getJson',
+      SrsName : 'EPSG:4326'
+  };
+  
+  var parameters = L.Util.extend(defaultParameters);
+  var URL = owsrootUrl + L.Util.getParamString(parameters);
+  
+  return URL;
+}
+
+// 2.3 Argentina
+
+function ign(name){
+  
+  var owsrootUrl = 'https://wms.ign.gob.ar/geoserver/wfs';
+  
+  var defaultParameters = {
+      service : 'WFS',
+      version : '2.0',
+      request : 'GetFeature',
+      typeName : name,
+      outputFormat : 'application/json',
+      format_options : 'callback:getJson',
+      SrsName : 'EPSG:4674'
+  };
+  
+  var parameters = L.Util.extend(defaultParameters);
+  var URL = owsrootUrl + L.Util.getParamString(parameters);
+  
+  return URL;
+}
+
+// 2.4 Uruguay
 
 /* This works in browser:
 https://srvgis.igm.gub.uy/arcgis/services/LimitesNacionalesMarinos_wfs_250000/MapServer/WFSServer?service=wfs&request=GetFeature&typeName=LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000&outputFormat=GEOJSON
@@ -84,18 +154,17 @@ function igm(name){
   return URL;
 }
 
-function ign(name){
-  
-  var owsrootUrl = 'https://wms.ign.gob.ar/geoserver/wfs';
+function dinama(name){
+  var owsrootUrl = 'https://www.dinama.gub.uy/geoserver/u19600217/wms';
   
   var defaultParameters = {
       service : 'WFS',
-      version : '2.0',
+      version : '2.0.0',
       request : 'GetFeature',
       typeName : name,
       outputFormat : 'application/json',
       format_options : 'callback:getJson',
-      SrsName : 'EPSG:4674'
+      srsname : 'EPSG:4326'
   };
   
   var parameters = L.Util.extend(defaultParameters);
@@ -104,25 +173,7 @@ function ign(name){
   return URL;
 }
 
-function ibge(name){
-  
-  var owsrootUrl = 'https://geoservicos.ibge.gov.br/geoserver/ows';
-  
-  var defaultParameters = {
-      service : 'WFS',
-      version : '2.0',
-      request : 'GetFeature',
-      typeName : name,
-      outputFormat : 'application/json',
-      format_options : 'callback:getJson',
-      SrsName : 'EPSG:4326'
-  };
-  
-  var parameters = L.Util.extend(defaultParameters);
-  var URL = owsrootUrl + L.Util.getParamString(parameters);
-  
-  return URL;
-}
+// Other helper functions
 
 function link(feature){
   return "<a href= http://www.marineregions.org/gazetteer.php?p=details&id=" + 

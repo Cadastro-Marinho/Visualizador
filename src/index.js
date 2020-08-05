@@ -109,7 +109,7 @@ var correntesmaritimas = $.ajax({
 // Add the variable for each of your AJAX requests to $.when()
 $.when(latinamerica, limitesUY, iwAR).done(function() {
   
-  var mappos = L.Permalink.getMapLocation(zoom = 5, center = [-20, -50]);
+  var mappos = L.Permalink.getMapLocation(zoom = 4, center = [-30, -52]);
 
   // Initializes the map
   var map = L.map('map', {
@@ -205,8 +205,10 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     opacity: 0.75,
     fillOpacity: 0.25,
     style: {
-      color: 'red',
-      weight: 2
+      color: 'LightGray',
+      weight: 1,
+      stroke: true,
+      dashArray: 5
     }
   };
   
@@ -285,6 +287,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
   
   // 2.3 Argentina
   
+  /*
   var Departamento =  new L.WFS({
     url: 'https://wms.ign.gob.ar/geoserver/wfs',
     typeNS: 'ign',
@@ -297,6 +300,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
       weight: 1
     }
   }).addTo(map);
+  */
   
 /*
   var Departamento = L.geoJSON(departamento.responseJSON, {
@@ -345,8 +349,8 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     geometryField: 'geom',
     crs: L.CRS.EPSG4326,
     style: {
-        color:  '#637fd2',
-        weight: 1,
+        color:  '#f1f4c7',
+        weight: 2,
         opacity: 1
     }
   }).addTo(map);
@@ -370,9 +374,10 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
   
   var EXTENSAO = L.geoJSON(extensao.responseJSON, {
     style: {
-      color: '#637fd2',
-      weight: 1,
-      fillOpacity: 0
+      color: '#f1f4c7',
+      fillColor: '#637fd2',
+      weight: 2,
+      fillOpacity: 0.40
     },
     onEachFeature: function( feature, layer ){
       layer.bindPopup(
@@ -396,9 +401,9 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
   
   var IWAR = L.geoJSON(iwAR.responseJSON, {
     style: {
-      color: '#637fd2',
+      color: '#f1f4c7',
       fillColor: '#637fd2',
-      weight: 1,
+      weight: 2,
       opacity: 1,
       dashArray: '3',
       fillOpacity: 0.40
@@ -422,9 +427,10 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     crs: L.CRS.EPSG4326,
     fillOpacity: 0.25,
     style: {
-        color:  '#637fd2',
-        weight: 1,
-        opacity: 1
+      color:  '#f1f4c7',
+      fillColor: '#637fd2',
+      weight: 2,
+      opacity: 1
     }
   }).addTo(map);
   
@@ -436,9 +442,10 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     crs: L.CRS.EPSG4326,
     fillOpacity: 0.25,
     style: {
-        color:  '#637fd2',
-        weight: 1,
-        opacity: 1
+      color:  '#f1f4c7',
+      fillColor: '#637fd2',
+      weight: 2,
+      opacity: 1
     }
   }).addTo(map);
 
@@ -450,16 +457,71 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     crs: L.CRS.EPSG4326,
     fillOpacity: 0,
     style: {
-        color:  '#637fd2',
-        weight: 1,
-        opacity: 1
+      color:  '#f1f4c7',
+      fillColor: '#637fd2',
+      weight: 2,
+      opacity: 1
     }
   }).addTo(map);
   
   var EXTENSAOAR = new L.WFS({
     url: 'https://wms.ign.gob.ar/geoserver/wfs',
     typeNS: 'ign',
-    typeName: 'ign:plataforma_continental',
+    typeName: 'plataforma_continental',
+    geometryField: 'geom',
+    crs: L.CRS.EPSG4326,
+    fillOpacity: 0.40,
+    style: {
+      color:  '#f1f4c7',
+      fillColor: '#637fd2',
+      weight: 2,
+      opacity: 1
+    }
+  }).addTo(map);
+  
+  // 3.4 Uruguay
+
+  var LimitesNacionalesMarinosUY = L.geoJSON(limitesUY.responseJSON,  {
+    style: function(feature) {
+      return{
+        color: '#f1f4c7',
+        weight: 2,
+        opacity: 1
+      };
+    }
+  }).addTo(map);
+  
+  var zonasUY = $.ajax({
+    url : dinama('u19600217:c321'),
+    jsonpCallback: 'getJson',
+    success:  console.log('Uruguay Maritime Zones successfully loaded.'),
+    error: function (xhr) {
+      alert(xhr.statusText);
+    }
+  });
+  
+  var zonasMaritimasUY = L.geoJSON(zonasUY.responseJSON, {
+    style: {
+      color: '#f1f4c7',
+      fillColor: '#637fd2',
+      weight: 2,
+      fillOpacity: 0.40
+    },
+    onEachFeature: function( feature, layer ){
+      layer.bindPopup(
+        "<b>Nome: </b>" + feature.properties.nome + "<br>" +
+        "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
+        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
+          maximumFractionDigits: 2 }) + " km&#178;"
+      );
+    }
+  }).addTo(map);
+  
+  /*
+  var zonasJuridicasUY = new L.WFS({
+    url: 'https://www.dinama.gub.uy/geoserver/u19600217/wms',
+    typeNS: 'u19600217',
+    typeName: 'c321',
     geometryField: 'geom',
     crs: L.CRS.EPSG4326,
     style: {
@@ -468,124 +530,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
         opacity: 1
     }
   }).addTo(map);
-
-/*  
-  var TSAR = L.geoJson(tsar.responseJSON, {
-      style: function (feature) {
-        return {
-          color: '#637fd2',
-          fillColor: '#637fd2',
-          weight: 1,
-          opacity: 1,
-          dashArray: '3',
-          fillOpacity: 0.40
-        };
-      },
-      onEachFeature: function (feature, layer) {
-        popupOptions = {maxWidth: 200};
-        layer.bindPopup(
-          "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
-          "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', {
-            maximumFractionDigits: 0 }) + " km&#178; <br>" +
-          "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjptYXJfdGVycml0b3JpYWxfYXJnZW50aW5vLnBkZg%3D%3D target='_blank'>Link.</a>"
-        ,popupOptions);
-      }
-  }).addTo(map);
-  
-  var CZAR = L.geoJSON(czAR.responseJSON, {
-    style: {
-      color: '#637fd2',
-      fillColor: '#637fd2',
-      weight: 1,
-      opacity: 1,
-      dashArray: '3',
-      fillOpacity: 0.40
-    },  
-    onEachFeature: function( feature, layer ){
-      layer.bindPopup(
-        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
-        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" +
-        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjp6b25hX2NvbnRpZ3VhX2FyZ2VudGluYS5wZGY%3D target='_blank'>Link.</a>"
-      );
-    }
-  }
-  ).addTo(map);
-  
-  var EEZAR = L.geoJSON(eezAR.responseJSON, {
-    style: {
-      color: '#637fd2',
-      fillColor: '#637fd2',
-      weight: 1,
-      opacity: 1,
-      dashArray: '3',
-      fillOpacity: 0.40
-    },
-    onEachFeature: function( feature, layer ){
-      layer.bindPopup(
-        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
-        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" +
-        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjp6b25hX2Vjb25vbWljYV9leGNsdXNpdmFfYXJnZW50aW5hLnBkZg%3D%3D target='_blank'>Link.</a>"  
-      );
-    }
-  }
-  ).addTo(map);
-  
-  var EXTENSAOAR = L.geoJSON(extensaoAR.responseJSON, {
-    style: {
-      color: '#637fd2',
-      weight: 1,
-      fillOpacity: 0.25
-    },  
-    onEachFeature: function( feature, layer ){
-      layer.bindPopup(
-        "<b>Descrição: </b>" + feature.properties.objeto + "<br>" +
-        "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
-          maximumFractionDigits: 0 }) + " km&#178; <br>" +
-        "<b>Metadados: </b>" + "<a href=http://ramsac.ign.gob.ar/operaciones_sig/shp_from_geoserver/download.php?f=bWV0YWRhdG9zOjpwbGF0YWZvcm1hX2NvbnRpbmVudGFsLnBkZg%3D%3D target='_blank'>Link.</a>"
-      );
-    }
-  }).addTo(map);
-*/
-  
-  // 3.4 Uruguai
-
-/*
-  var LimitesNacionalesMarinosUY = new L.WFS({
-    crs: L.CRS.EPSG4326,
-//    filter: new L.Filter.EQ('USE_', 'INTERNACIONAL'),
-    geometryField: 'Shape',
-    url: 'https://srvgis.igm.gub.uy/arcgis/services/LimitesNacionalesMarinos_wfs_250000/MapServer/WFSServer?service=WFS',
-    typeNS: 'LimitesNacionalesMarinos_wfs_250000',
-    typeName: 'LimitesNacionalesMarinos_wfs_250000',
-    style: {
-        color:  '#637fd2',
-        weight: 1,
-        opacity: 1
-    }
-  }).addTo(map);
-
-  var limitesUY = $.ajax({
-    url : igm('LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000'),
-    jsonpCallback: 'getJson',
-    success:  console.log(igm('LimitesNacionalesMarinos_wfs_250000:LimitesNacionalesMarinos_wfs_250000')),
-    error: function (xhr) {
-      alert(xhr.statusText);
-    }
-  });
-*/
-
-  var LimitesNacionalesMarinosUY = L.geoJSON(limitesUY.responseJSON,  {
-    style: function(feature) {
-      return{
-        color: '#637fd2',
-        weight: 1,
-        opacity: 1
-      };
-    }
-  }).addTo(map);
-
+  */
 
   // 4. Adds thematic layers
   
@@ -739,7 +684,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
   // Adds basemaps choices
     
   var basemaps = [
-          Esri_OceanBasemap, GEBCO, Esri_NatGeoWorldMap, Esri_WorldImagery, 
+          GEBCO, Esri_OceanBasemap, Esri_NatGeoWorldMap, Esri_WorldImagery, 
           OpenStreetMap_Mapnik , OpenTopoMap
           ];
         
@@ -757,7 +702,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     "Limites territoriais":{
       "América Latina": LatinAmerica,
       "Estados (BR)": UF_2013,
-      "Departamentos (AR)": Departamento,
+//      "Departamentos (AR)": Departamento,
       "Linha de Costa (BR)": linhaCostaBR,
       "Linea de Costa (AR)": linhaCostaAR
     },
@@ -778,7 +723,8 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
       "Mar Territorial (AR)": TSAR,
       "Zona Contígua (AR)": CZAR,
       "Zona Econômica Exclusiva (AR)": EEZAR,
-      "Plataforma Continental (AR)": EXTENSAOAR
+      "Plataforma Continental (AR)": EXTENSAOAR,
+      "Zonas Marítimas (UY)": zonasJuridicasUY
       //"Zona Contígua (24MN)": CZ,
     },
     "Marine Regions":{
