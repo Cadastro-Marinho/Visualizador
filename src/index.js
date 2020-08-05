@@ -30,6 +30,16 @@ var limitesUY = $.ajax({
   }
 });
 
+var zonasUY = $.ajax({
+  url : dinama('u19600217:c321'),
+  dataType : 'jsonp',
+  jsonpCallback : 'getJson',
+  success:  console.log('Uruguay Maritime Zones successfully loaded.'),
+  error: function (xhr) {
+    alert(xhr.statusText);
+  }
+});
+
 
 var eez = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
@@ -287,11 +297,10 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
   
   // 2.3 Argentina
   
-  /*
   var Departamento =  new L.WFS({
     url: 'https://wms.ign.gob.ar/geoserver/wfs',
-    typeNS: 'ign',
-    typeName: 'departamento',
+    //typeNS: 'ign',
+    typeName: 'ign:departamento',
     geometryField: 'geom',
     crs: L.CRS.EPSG4326,
     fillOpacity: 0.25,
@@ -300,7 +309,6 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
       weight: 1
     }
   }).addTo(map);
-  */
   
 /*
   var Departamento = L.geoJSON(departamento.responseJSON, {
@@ -491,16 +499,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     }
   }).addTo(map);
   
-  var zonasUY = $.ajax({
-    url : dinama('u19600217:c321'),
-    jsonpCallback: 'getJson',
-    success:  console.log('Uruguay Maritime Zones successfully loaded.'),
-    error: function (xhr) {
-      alert(xhr.statusText);
-    }
-  });
-  
-  var zonasMaritimasUY = L.geoJSON(zonasUY.responseJSON, {
+  var zonasJuridicasUY = L.geoJSON(zonasUY.responseJSON, {
     style: {
       color: '#f1f4c7',
       fillColor: '#637fd2',
@@ -519,10 +518,10 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
   
   /*
   var zonasJuridicasUY = new L.WFS({
-    url: 'https://www.dinama.gub.uy/geoserver/u19600217/wms',
+    url: 'http://www.dinama.gub.uy/geoserver/u19600217/wms',
     typeNS: 'u19600217',
     typeName: 'c321',
-    geometryField: 'geom',
+    geometryField: 'geometry',
     crs: L.CRS.EPSG4326,
     style: {
         color:  '#637fd2',
@@ -605,6 +604,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
       }
   });
   */
+  
   // Adds NOAA Undersea Feature Names from NOAA
   
   var NOAAPolygons = NOAA.getLayer('0');
@@ -623,16 +623,17 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     }
   }).addTo(map);
 
-  */
-  
   var Cables = L.geoJSON(cables.responseJSON, {
     style: function(feature) {
-      return {color: feature.properties.color};
+      return {
+        color: feature.properties.color
+      };
     },
     onEachFeature: function (feature, layer) {
 		  layer.bindPopup(feature.properties.slug);
 	  }
   }).addTo(map);
+  */
   
   // 4.2 Brasil layers
 
@@ -644,35 +645,6 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     transparency: true,
     opacity: 0.2
   });
-  
-  /*  
-  var curvaBatimetrica = null;
-  
-  var curvabatimetrica = $.ajax({
-      url : ibge('CCAR:BCIM_Curva_Batimetrica_L'),
-      dataType : 'json',
-      jsonpCallback : 'getJson',
-      success: function (response) {
-          curvaBatimetrica = L.geoJson(response, {
-              style: function (feature) {
-                  return {
-                      stroke: true,
-                      fillColor: 'yellow',
-                      fillOpacity: 0.25
-                  };
-              },
-              onEachFeature: function (feature, layer) {
-                  popupOptions = {maxWidth: 200};
-                  layer.bindPopup(
-                    "<b>Departamento: </b>" + feature.properties.fna + "<br>" +
-                    "<b>Código INDEC: </b>" + feature.properties.in1 + "<br>" +
-                    "<b>Área: </b>" 
-                      ,popupOptions);
-              }
-          }).addTo(map);
-      }
-  });
-  */
   
   // Adds Minimap
   var miniMap = new L.Control.MiniMap(Esri_NatGeoWorldMap, {
@@ -702,7 +674,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     "Limites territoriais":{
       "América Latina": LatinAmerica,
       "Estados (BR)": UF_2013,
-//      "Departamentos (AR)": Departamento,
+      "Departamentos (AR)": Departamento,
       "Linha de Costa (BR)": linhaCostaBR,
       "Linea de Costa (AR)": linhaCostaAR
     },
@@ -717,15 +689,13 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
       "Limites Marinhos (UY)": LimitesNacionalesMarinosUY
     },
     "Zonas Marítimas":{
-     // "Zona Econômica Exclusiva (200MN)": EEZ,
       "Plataforma Continental (BR)": EXTENSAO,
       "Águas Internas (AR)": IWAR,
       "Mar Territorial (AR)": TSAR,
       "Zona Contígua (AR)": CZAR,
       "Zona Econômica Exclusiva (AR)": EEZAR,
       "Plataforma Continental (AR)": EXTENSAOAR,
-      "Zonas Marítimas (UY)": zonasJuridicasUY
-      //"Zona Contígua (24MN)": CZ,
+//      "Zonas Marítimas (UY)": zonasJuridicasUY
     },
     "Marine Regions":{
       "Mar Territorial": TS,

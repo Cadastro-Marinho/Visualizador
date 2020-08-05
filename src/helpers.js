@@ -155,16 +155,17 @@ function igm(name){
 }
 
 function dinama(name){
-  var owsrootUrl = 'https://www.dinama.gub.uy/geoserver/u19600217/wms';
+  
+  var owsrootUrl = 'http://www.dinama.gub.uy/geoserver/u19600217/wms';
   
   var defaultParameters = {
       service : 'WFS',
-      version : '2.0.0',
+      version : '1.1.0',
       request : 'GetFeature',
       typeName : name,
-      outputFormat : 'application/json',
+      outputFormat : 'text/javascript',
       format_options : 'callback:getJson',
-      srsname : 'EPSG:4326'
+      SrsName : 'EPSG:4326'
   };
   
   var parameters = L.Util.extend(defaultParameters);
