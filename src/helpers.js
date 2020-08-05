@@ -24,14 +24,16 @@ function marineRegions(name, sql_text){
 // NOAA WMS Layers Source
 
 var optionsNOAA = {
-  'version': '1.3',
+  'version': '1.3.0',
   'format': 'image/png', 
   'transparent': true, 
   'opacity': 1,
   'info_format': 'text/html'
 };
 
-var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer", optionsNOAA);
+// var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/web_mercator/undersea_features/MapServer/WMSServer", optionsNOAA);
+
+var NOAA = L.WMS.source("https://gis.ngdc.noaa.gov/arcgis/services/IHO/undersea_features/MapServer/WMSServer", optionsNOAA);
 
 // IBGE WMS Layers Source
 
@@ -67,12 +69,13 @@ function igm(name){
       service : 'WFS',
       version : '2.0.0',
       request : 'GetFeature',
-      typeName : name,
+      typeNames : name,
       outputFormat : 'GEOJSON',
       format_options : 'callback:getJson',
-//      SrsName : 'EPSG:4326',
-//      IgnoreAxisOrientation: '1',
-//      pageSize: 0
+      srsname : 'EPSG:4326',
+      IgnoreAxisOrientation: '1',
+      pagingEnabled: 'true',
+      pageSize: 0
   };
   
   var parameters = L.Util.extend(defaultParameters);
