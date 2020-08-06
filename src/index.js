@@ -31,7 +31,7 @@ var limitesUY = $.ajax({
 });
 
 var zonasUY = $.ajax({
-  url : dinama('u19600217:c321'),
+  url : dinama('u19600217:c321', "IN (3, 8, 10)"),
   dataType : 'jsonp',
   jsonpCallback : 'getJson',
   success:  console.log('Uruguay Maritime Zones successfully loaded.'),
@@ -508,8 +508,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     },
     onEachFeature: function( feature, layer ){
       layer.bindPopup(
-        "<b>Nome: </b>" + feature.properties.nome + "<br>" +
-        "<b>Região: </b>" +  feature.properties.regiao + "<br>" +
+        "<b>Nome: </b>" + feature.properties.descripcio + "<br>" +
         "<b>Área: </b>" + Area(feature).toLocaleString('de-DE', { 
           maximumFractionDigits: 2 }) + " km&#178;"
       );
