@@ -31,7 +31,7 @@ var limitesUY = $.ajax({
 });
 
 var zonasUY = $.ajax({
-  url : dinama('u19600217:c321', "IN (3, 8, 10)"),
+  url : dinama('u19600217:c321', "id in (1, 3, 8, 10)"),
   dataType : 'jsonp',
   jsonpCallback : 'getJson',
   success:  console.log('Uruguay Maritime Zones successfully loaded.'),

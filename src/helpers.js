@@ -166,7 +166,7 @@ function dinama(name, filter){
       outputFormat : 'text/javascript',
       format_options : 'callback:getJson',
       SrsName : 'EPSG:4326',
-      CQL_FILTER: filter
+      cql_filter: filter
   };
   
   var parameters = L.Util.extend(defaultParameters);
