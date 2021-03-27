@@ -427,6 +427,22 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
   }
   ).addTo(map);
   
+    var linhasAR = new L.WFS({
+    url: 'https://wms.ign.gob.ar/geoserver/wfs',
+    typeNS: 'ign',
+    typeName: 'linea_limite_maritimos',
+    geometryField: 'geom',
+    crs: L.CRS.EPSG4326,
+    fillOpacity: 0.25,
+    style: {
+      color:  '#f1f4c7',
+      fillColor: '#637fd2',
+      weight: 2,
+      opacity: 1
+    }
+  }).addTo(map);
+  
+  /*
   var TSAR = new L.WFS({
     url: 'https://wms.ign.gob.ar/geoserver/wfs',
     typeNS: 'ign',
@@ -486,6 +502,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
       opacity: 1
     }
   }).addTo(map);
+  */
   
   // 3.4 Uruguay
 
