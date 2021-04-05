@@ -120,7 +120,7 @@ var correntesmaritimas = $.ajax({
 // Add the variable for each of your AJAX requests to $.when()
 $.when(latinamerica, limitesUY, iwAR).done(function() {
   
-  var mappos = L.Permalink.getMapLocation(zoom = 4, center = [-30, -52]);
+  var mappos = L.Permalink.getMapLocation(zoom = 3, center = [-35, -50]);
 
   // Initializes the map
   var map = L.map('map', {
