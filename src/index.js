@@ -30,6 +30,7 @@ var limitesUY = $.ajax({
   }
 });
 
+/*
 var zonasUY = $.ajax({
   url : dinama('u19600217:c321', "id in (1, 3, 8, 10)"),
   dataType : 'jsonp',
@@ -39,7 +40,7 @@ var zonasUY = $.ajax({
     alert(xhr.statusText);
   }
 });
-
+*/
 
 var eez = $.ajax({
   url:"https://raw.githubusercontent.com/Cadastro-Marinho/LatinAmericaData/master/EEZ.geojson",
@@ -516,6 +517,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     }
   }).addTo(map);
   
+  /*
   var zonasJuridicasUY = L.geoJSON(zonasUY.responseJSON, {
     style: {
       color: '#f1f4c7',
@@ -531,7 +533,7 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
       );
     }
   }).addTo(map);
-  
+  */
   /*
   var zonasJuridicasUY = new L.WFS({
     url: 'http://www.dinama.gub.uy/geoserver/u19600217/wms',
@@ -707,10 +709,10 @@ $.when(latinamerica, limitesUY, iwAR).done(function() {
     "Zonas Marítimas":{
       "Plataforma Continental (BR)": EXTENSAO,
       "Águas Internas (AR)": IWAR,
-      "Mar Territorial (AR)": TSAR,
-      "Zona Contígua (AR)": CZAR,
-      "Zona Econômica Exclusiva (AR)": EEZAR,
-      "Plataforma Continental (AR)": EXTENSAOAR,
+      //"Mar Territorial (AR)": TSAR,
+      //"Zona Contígua (AR)": CZAR,
+      //"Zona Econômica Exclusiva (AR)": EEZAR,
+      //"Plataforma Continental (AR)": EXTENSAOAR,
 //      "Zonas Marítimas (UY)": zonasJuridicasUY
     },
     "Marine Regions":{
